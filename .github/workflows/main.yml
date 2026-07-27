@@ -51,17 +51,24 @@ jobs:
             zip \
             unzip
 
-      - name: Install Buildozer and Cython
+      - name: Install Buildozer & Cython
         run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade setuptools
-          pip install cython==0.29.33
+          python -m pip install --upgrade pip setuptools
+          pip install "cython<3.0.0"
           pip install buildozer
 
-      - name: Build APK with Buildozer
+      - name: Check buildozer.spec
         run: |
-          # Jalankan buildozer secara otomatis tanpa prompt interaktif
-          yes | buildozer -v android debug
+          if [ ! -f "buildozer.spec" ]; then
+            echo "File buildozer.spec tidak ditemukan di repo! Membuat default..."
+            buildozer init
+          fi
+
+      - name: Build APK with Buildozer
+        env:
+          APP_ANDROID_ACCEPT_SDK_LICENSES: '1'
+        run: |
+          buildozer android debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
