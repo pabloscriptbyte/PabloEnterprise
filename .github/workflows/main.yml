@@ -37,6 +37,7 @@ jobs:
             libavformat-dev \
             libavcodec-dev \
             zlib1g-dev \
+            libjpeg-dev \
             libgstreamer1.0-dev \
             gstreamer1.0-plugins-base \
             gstreamer1.0-plugins-good \
@@ -46,6 +47,12 @@ jobs:
             libssl-dev \
             lzma \
             liblzma-dev \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config \
+            cmake \
+            lld \
             ccache \
             openjdk-17-jdk \
             zip \
@@ -60,7 +67,7 @@ jobs:
       - name: Check buildozer.spec
         run: |
           if [ ! -f "buildozer.spec" ]; then
-            echo "File buildozer.spec tidak ditemukan di repo! Membuat default..."
+            echo "File buildozer.spec tidak ditemukan! Membuat default..."
             buildozer init
           fi
 
