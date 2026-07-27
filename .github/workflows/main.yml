@@ -1,27 +1,42 @@
-name: PABLO ENTERPRISE APK BUILDER
+name: Build Android APK
 
 on:
   push:
     branches:
       - main
+      - master
   workflow_dispatch:
 
 jobs:
   build:
+    name: Build APK with Buildozer
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build APK
-        uses: digreatbrian/buildozer-action@v2
+      - name: Cache Buildozer Global Directory
+        uses: actions/cache@v4
         with:
-          buildozer_version: stable
-          command: buildozer android debug
+          path: ~/.buildozer
+          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
 
-      - name: Upload APK
+      - name: Cache Android SDK / NDK
+        uses: actions/cache@v4
+        with:
+          path: ~/.android
+          key: ${{ runner.os }}-android-${{ hashFiles('buildozer.spec') }}
+
+      - name: Build APK using Buildozer
+        uses: ArtemShtepenko/Kivy-Buildozer-Action@v1.2
+        id: buildozer
+        with:
+          command: buildozer -v android debug
+          subfolder: .
+
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PABLO-ENTERPRISE-APK
+          name: PabloEnterprise-Android-APK
           path: bin/*.apk
