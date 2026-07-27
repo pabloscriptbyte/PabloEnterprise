@@ -16,24 +16,52 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Cache Buildozer Global Directory
-        uses: actions/cache@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          path: ~/.buildozer
-          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+          python-version: '3.11'
 
-      - name: Cache Android SDK / NDK
-        uses: actions/cache@v4
-        with:
-          path: ~/.android
-          key: ${{ runner.os }}-android-${{ hashFiles('buildozer.spec') }}
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            git \
+            ffmpeg \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixin-dev \
+            libsdl2-ttf-dev \
+            libportmidi-dev \
+            libswscale-dev \
+            libavformat-dev \
+            libavcodec-dev \
+            zlib1g-dev \
+            libgstreamer1.0-dev \
+            gstreamer1.0-plugins-base \
+            gstreamer1.0-plugins-good \
+            libsqlite3-dev \
+            sqlite3 \
+            libffi-dev \
+            libssl-dev \
+            lzma \
+            liblzma-dev \
+            ccache \
+            openjdk-17-jdk \
+            zip \
+            unzip
 
-      - name: Build APK using Buildozer
-        uses: ArtemShtepenko/Kivy-Buildozer-Action@v1.2
-        id: buildozer
-        with:
-          command: buildozer -v android debug
-          subfolder: .
+      - name: Install Buildozer and Cython
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade setuptools
+          pip install cython==0.29.33
+          pip install buildozer
+
+      - name: Build APK with Buildozer
+        run: |
+          # Jalankan buildozer secara otomatis tanpa prompt interaktif
+          yes | buildozer -v android debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
